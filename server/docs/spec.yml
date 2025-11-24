@@ -1,0 +1,205 @@
+openapi: 3.1.0
+info:
+  title: Brev.ly API
+  version: 1.0.0
+  description: API para encurtar URLs, redirecionar acessos e exportar links em CSV.
+
+servers:
+  - url: http://localhost:3333
+    description: Ambiente de desenvolvimento
+
+tags:
+  - name: links
+    description: Operações de criação, listagem e gerenciamento de links curtos
+  - name: redirect
+    description: Redirecionamento para URL original a partir do short-code
+  - name: export
+    description: Exportação de links em CSV
+
+paths:
+  /links:
+    post:
+      summary: Criar link curto
+      tags: [links]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLinkInput'
+      responses:
+        '201':
+          description: Link curto criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '400':
+          description: URL inválida ou short-code já existente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Listar todos os links curtos
+      tags: [links]
+      responses:
+        '200':
+          description: Lista de links curtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Link'
+
+  /links/{shortCode}:
+    get:
+      summary: Obter detalhes de um link encurtado
+      tags: [links]
+      parameters:
+        - in: path
+          name: shortCode
+          required: true
+          schema:
+            type: string
+          description: O short-code do link curto
+      responses:
+        '200':
+          description: Link curto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '404':
+          description: Link curto não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Deletar um link encurtado
+      tags: [links]
+      parameters:
+        - in: path
+          name: shortCode
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Link deletado com sucesso
+        '404':
+          description: Link curto não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /{shortCode}:
+    get:
+      summary: Redirecionar para a URL original
+      tags: [redirect]
+      parameters:
+        - in: path
+          name: shortCode
+          required: true
+          schema:
+            type: string
+          description: O short-code do link curto
+      responses:
+        '302':
+          description: Redirecionamento para a URL original
+          headers:
+            Location:
+              description: URL de destino
+              schema:
+                type: string
+                format: uri
+        '404':
+          description: Link curto não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /links/export:
+    post:
+      summary: Exportar links curtos em CSV e salvar em storage
+      tags: [export]
+      responses:
+        '201':
+          description: Exportação realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResult'
+        '500':
+          description: Erro ao gerar o arquivo CSV
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CreateLinkInput:
+      type: object
+      required:
+        - originalUrl
+      properties:
+        originalUrl:
+          type: string
+          format: uri
+          description: A URL original que será encurtada
+        shortCode:
+          type: string
+          description: Código curto personalizado (opcional)
+
+    Link:
+      type: object
+      required:
+        - id
+        - originalUrl
+        - shortCode
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identificador único do link curto
+        originalUrl:
+          type: string
+          format: uri
+          description: A URL original que foi encurtada
+        shortCode:
+          type: string
+          description: Código curto do link
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação do link curto
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data da última atualização do link curto
+
+    ExportResult:
+      type: object
+      required:
+        - fileUrl
+      properties:
+        fileUrl:
+          type: string
+          format: uri
+          description: URL do arquivo CSV gerado no storage
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        statusCode:
+          type: integer
