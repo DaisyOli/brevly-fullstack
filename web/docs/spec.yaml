@@ -1,0 +1,302 @@
+app:
+  name: Brev.ly Web
+  description: >
+    SPA em React + TypeScript para gerenciar URLs encurtadas
+    consumindo a API do Brev.ly.
+  stack:
+    required:
+      - react
+      - typescript
+      - vite
+    optional:
+      - tailwindcss
+      - react-query
+      - react-hook-form
+      - zod
+
+environment:
+  env_file: .env.example
+  variables:
+    VITE_FRONTEND_URL:
+      description: http://localhost:5173
+      required: true
+    VITE_BACKEND_URL:
+      description: http://localhost:3333
+      required: true
+
+api:
+  base_url: ${VITE_BACKEND_URL}
+  endpoints:
+    create_link:
+      method: POST
+      path: /links
+      description: Criar um link encurtado.
+      request_body:
+        originalUrl: string
+        shortCode:
+          type: string
+          required: false
+      success_response:
+        status: 201
+        body:
+          id: string
+          originalUrl: string
+          shortCode: string
+          clicks: number
+          createdAt: string
+      error_cases:
+        - code: INVALID_SHORTCODE_FORMAT
+          description: Encurtamento mal formatado.
+        - code: SHORTCODE_ALREADY_EXISTS
+          description: Encurtamento já existente.
+    list_links:
+      method: GET
+      path: /links
+      description: Listar todas as URLs cadastradas.
+      success_response:
+        status: 200
+        body:
+          - id: string
+            originalUrl: string
+            shortCode: string
+            clicks: number
+            createdAt: string
+    delete_link:
+      method: DELETE
+      path: /links/{shortCode}
+      description: Deletar um link pelo encurtamento.
+      path_params:
+        shortCode: string
+      success_response:
+        status: 204
+    export_links:
+      method: POST
+      path: /links/export
+      description: Gerar um CSV com relatório dos links criados.
+      success_response:
+        status: 201
+        body:
+          url: string  # URL pública do CSV via CDN
+    redirect:
+      method: GET
+      path: /{shortCode}
+      description: Obter a URL original a partir do encurtamento e registrar acesso.
+      path_params:
+        shortCode: string
+      behavior:
+        - increment_clicks: true
+        - redirects_to_original_url: true
+
+routes:
+  - path: /
+    name: Home
+    description: >
+      Página principal com formulário de cadastro e listagem de links.
+    components:
+      - LinkForm
+      - LinksTable
+      - Header
+      - ExportButton
+    api_interactions:
+      - list_links
+      - create_link
+      - delete_link
+      - export_links
+  - path: "/:shortCode"
+    name: Redirect
+    description: >
+      Página responsável por ler o encurtamento da URL, consultar a API
+      e redirecionar o usuário para a URL original.
+    components:
+      - RedirectHandler
+    api_interactions:
+      - redirect
+  - path: "*"
+    name: NotFound
+    description: >
+      Página exibida quando o usuário acessa uma rota inválida ou
+      quando a URL encurtada informada não existe.
+    components:
+      - NotFoundMessage
+
+types:
+  Link:
+    description: Representa uma URL encurtada.
+    fields:
+      id: string
+      originalUrl: string
+      shortCode: string
+      clicks: number
+      createdAt: string
+
+components:
+  LinkForm:
+    description: Formulário para criação de novas URLs encurtadas.
+    location: src/components/LinkForm.tsx
+    props:
+      onCreateSuccess:
+        type: function
+        description: Callback para atualizar a listagem após criação.
+    fields:
+      originalUrl:
+        type: text
+        label: URL original
+        required: true
+      shortCode:
+        type: text
+        label: Encurtamento (opcional)
+        required: false
+    states:
+      - idle     # campos habilitados, sem mensagem
+      - submitting  # botão desabilitado, ícone de carregamento
+      - success  # mensagem de sucesso/opcional
+      - error_invalid_shortCode
+      - error_shortCode_exists
+      - error_generic
+    interactions:
+      submit:
+        description: >
+          Ao enviar, chama POST /links. Em caso de sucesso, limpa campos
+          e dispara onCreateSuccess. Em caso de erro, exibe mensagem apropriada.
+
+  LinksTable:
+    description: Tabela ou lista que exibe todas as URLs cadastradas.
+    location: src/components/LinksTable.tsx
+    props:
+      links:
+        type: Link[]
+      onDelete:
+        type: function
+        description: Função chamada ao clicar em excluir.
+    item_fields:
+      - originalUrl
+      - shortUrl  # derivado: ${VITE_FRONTEND_URL}/${shortCode}
+      - clicks
+      - createdAt
+    actions:
+      - open_link      # navega para /:shortCode
+      - delete_link    # chama DELETE /links/{shortCode}
+    states:
+      - loading
+      - empty
+      - error
+      - ready
+
+  Header:
+    description: Header simples com título e subtítulo da aplicação.
+    location: src/components/Header.tsx
+
+  ExportButton:
+    description: Botão responsável por disparar a exportação do CSV.
+    location: src/components/ExportButton.tsx
+    states:
+      - idle
+      - exporting   # botão desabilitado, ícone de carregamento
+      - error
+    interactions:
+      click:
+        description: >
+          Chama POST /links/export. Em caso de sucesso, abre a URL retornada
+          em uma nova aba ou dispara download do arquivo.
+
+  RedirectHandler:
+    description: Componente usado na rota "/:shortCode" para realizar o redirecionamento.
+    location: src/pages/Redirect.tsx
+    states:
+      - loading   # mensagem tipo "Redirecionando..."
+      - not_found # redireciona ou exibe NotFound
+    behavior:
+      - obtém shortCode via parâmetros de rota
+      - redireciona para ${VITE_BACKEND_URL}/${shortCode}
+      - pode exibir NotFound se houver um mecanismo de detecção de 404
+
+  NotFoundMessage:
+    description: Mensagem exibida quando um recurso não é encontrado.
+    location: src/pages/NotFound.tsx
+    content:
+      title: "Recurso não encontrado"
+      description: >
+        A URL que você tentou acessar não existe ou expirou.
+      actions:
+        - label: "Voltar para a página inicial"
+          navigate_to: "/"
+
+ui:
+  layout:
+    strategy: "mobile-first"
+    toolkit: "TailwindCSS (opcional, porém recomendado)"
+    guidelines:
+      - usar container centralizado (max-width) na Home
+      - seguir o style guide do Figma para cores, fontes e espaçamentos
+      - garantir legibilidade em telas pequenas (celular)
+  states:
+    create_link:
+      - loading_indicator_on_submit
+      - disable_button_while_submitting
+      - show_specific_error_for_invalid_shortCode
+      - show_specific_error_for_existing_shortCode
+    list_links:
+      - show_loading_state_when_fetching
+      - show_empty_state_when_no_links
+      - show_error_state_when_request_fails
+    export_csv:
+      - disable_button_while_exporting
+      - show_loading_indicator
+      - show_error_message_on_failure
+    redirect:
+      - show_loading_text_while_resolving
+      - handle_not_found_as_404
+    not_found:
+      - clear_message_about_invalid_route_or_url
+      - primary_action_to_go_back_home
+
+requirements_traceability:
+  from_challenge:
+    - id: FE-01
+      description: "Deve ser possível criar um link"
+      implemented_by:
+        - route: "/"
+        - component: LinkForm
+    - id: FE-02
+      description: "Não deve ser possível criar um link com encurtamento mal formatado"
+      implemented_by:
+        - component: LinkForm
+        - ui_state: create_link.show_specific_error_for_invalid_shortCode
+    - id: FE-03
+      description: "Não deve ser possível criar um link com encurtamento já existente"
+      implemented_by:
+        - component: LinkForm
+        - ui_state: create_link.show_specific_error_for_existing_shortCode
+    - id: FE-04
+      description: "Deve ser possível deletar um link"
+      implemented_by:
+        - component: LinksTable
+        - action: delete_link
+    - id: FE-05
+      description: "Deve ser possível obter a URL original por meio do encurtamento"
+      implemented_by:
+        - route: "/:shortCode"
+        - component: RedirectHandler
+    - id: FE-06
+      description: "Deve ser possível listar todas as URL’s cadastradas"
+      implemented_by:
+        - route: "/"
+        - component: LinksTable
+    - id: FE-07
+      description: "Deve ser possível incrementar a quantidade de acessos de um link"
+      implemented_by:
+        - route: "/:shortCode"
+        - api: redirect.increment_clicks
+    - id: FE-08
+      description: "Deve ser possível baixar um CSV com o relatório dos links criados"
+      implemented_by:
+        - component: ExportButton
+  non_functional:
+    - id: NFR-01
+      description: "SPA em React + Vite + TypeScript"
+    - id: NFR-02
+      description: "Responsividade (desktop e mobile)"
+    - id: NFR-03
+      description: "Seguir layout do Figma (style guide, cores, fontes)"
+    - id: NFR-04
+      description: "Empty state, loading e bloqueio de ações conforme estado"
