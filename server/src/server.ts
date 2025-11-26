@@ -6,9 +6,17 @@ import fs from 'fs';
 import { createLinkRoute } from './http/routes/create-link';
 import { listLinksRoute } from './http/routes/list-links';
 import { redirectLinkRoute } from './http/routes/redirect-link';
+import { deleteLinkRoute } from './http/routes/delete-link';
+import { exportLinksRoute } from './http/routes/export-links';
+import fastifyCors from '@fastify/cors';
 
 
 const app = fastify();
+
+//habilitar o cors
+app.register(fastifyCors, {
+  origin: true,
+});
 
 //carregar spec.yml
 const specPath = path.join(__dirname, '..','docs', 'spec.yaml');
@@ -44,9 +52,20 @@ app.register(listLinksRoute);
 //rota para redirecionar o link
 app.register(redirectLinkRoute);
 
-app.listen({
-  port: 3333,
-}).then(() => {
-  console.log('🔥 Servidor rodando em http://localhost:3333');
-  console.log('📚 Documentação em http://localhost:3333/docs');
-})
+//rota para deletar o link
+app.register(deleteLinkRoute);
+
+//rota para exportar links
+app.register(exportLinksRoute);
+
+const port = Number(process.env.PORT) || 3333;
+
+app
+  .listen({ port, host: "0.0.0.0" })
+  .then(() => {
+    console.log(`HTTP server running on http://localhost:${port}`);
+  })
+  .catch((err) => {
+    console.error("Erro ao iniciar o servidor:", err);
+    process.exit(1);
+  });
