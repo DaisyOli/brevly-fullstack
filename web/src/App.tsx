@@ -1,11 +1,22 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Home } from './pages/Home'
+import { Redirect } from './pages/Redirect'
+import { NotFound } from './pages/NotFound'
+
 function App() {
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-50 p-8">
-      <h1 className="text-3xl font-bold">Brev.ly</h1>
-      <p className="mt-2 text-slate-300">
-        Tailwind v4 funcionando ✨
-      </p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Página inicial */}
+        <Route path="/" element={<Home />} />
+
+        {/* Página de redirecionamento com parâmetro dinâmico */}
+        <Route path="/:shortCode" element={<Redirect />} />
+
+        {/* Qualquer outra rota cai aqui */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
