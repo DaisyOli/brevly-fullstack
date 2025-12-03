@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# 🔗 Brev.ly — API de Encurtador de URLs  
+Projeto final do curso **Pós-Graduação 360º da Rocketseat**  
+Backend desenvolvido em **Node.js + Fastify + TypeScript + Drizzle ORM + PostgreSQL**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 🚀 Sobre o Projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+O **Brev.ly** é um encurtador de URLs completo, capaz de:
 
-## React Compiler
+- Criar links encurtados com ou sem shortCode customizado  
+- Registrar e contar cliques  
+- Redirecionar visitantes  
+- Listar todos os links  
+- Excluir links  
+- Exportar os dados em formato **CSV**  
+- Rodar em modo desenvolvimento, produção e Docker
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Este backend segue integralmente as Sprints definidas no desafio da fase final.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Tecnologias Utilizadas
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Node.js**
+- **Fastify**
+- **TypeScript**
+- **Drizzle ORM**
+- **PostgreSQL**
+- **Zod** (validação)
+- **Node fs** (geração de CSV)
+- **Dockerfile multi-stage**
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📁 Estrutura de Pastas
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+server/
+├─ src/
+│ ├─ db/
+│ ├─ http/
+│ │ └─ routes/
+│ ├─ server.ts
+├─ drizzle/
+├─ dist/ # gerado após build
+├─ docs/ # spec OpenAPI
+├─ exports/ # arquivos CSV gerados
+├─ package.json
+├─ Dockerfile
+├─ .env
+└─ .env.example
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## ⚙️ Variáveis de Ambiente
+
+Crie um arquivo `.env` baseado no `.env.example`:
+
+```env
+DATABASE_URL=postgres://user:password@localhost:5432/brevly
+PORT=3333
