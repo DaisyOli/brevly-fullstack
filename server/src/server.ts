@@ -16,6 +16,7 @@ const app = fastify();
 //habilitar o cors
 app.register(fastifyCors, {
   origin: true,
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
 });
 
 //carregar spec.yml
