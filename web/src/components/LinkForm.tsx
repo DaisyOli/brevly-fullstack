@@ -65,7 +65,7 @@ export function LinkForm({ onCreateSuccess }: LinkFormProps) {
   return (
     <>
       <section className="bg-white rounded-2xl shadow-sm px-6 pt-6 pb-5 md:px-8 md:pt-8 md:pb-6 w-full">
-        <h2 className="text-lg font-bold text-[#20222A] ">Novo link</h2>
+        <h2 className="text-lg pb-5 font-bold text-[#20222A] ">Novo link</h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           {/* LINK ORIGINAL */}
