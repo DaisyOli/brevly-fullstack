@@ -76,7 +76,7 @@ export function Redirect() {
           <img src="/Logo.svg" alt="brev.ly" className="h-6" />
         </div>
 
-        <h1 className="text-xl font-semibold text-[#20222A] mb-2">
+        <h1 className="text-[14px] font-semibold text-[#20222A] mb-2">
           Redirecionando...
         </h1>
 

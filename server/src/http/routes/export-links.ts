@@ -28,11 +28,11 @@ export async function exportLinksRoute(app: FastifyInstance) {
 
     // 2) Montar o conteúdo CSV
     const header = [
-      "id",
-      "originalUrl",
-      "shortCode",
-      "clicks",
-      "createdAt",
+      "ID",
+      "Original URL",
+      "Short URL",
+      "Access Count",
+      "Created At",
     ].join(",");
 
     const rows = allLinks.map((link) =>

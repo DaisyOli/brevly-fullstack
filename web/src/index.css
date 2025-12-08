@@ -1,11 +1,53 @@
 @import "tailwindcss";
 
 @theme {
+  /* Fonte principal */
   --font-sans: "Open Sans", system-ui, sans-serif;
+
+  --text-xl: [24px, 32px];  /* Text XL */
+  --text-lg: [18px, 24px];  /* Text Lg */
+  --text-base: [14px, 18px];/* Text Md */
+  --text-sm: [12px, 16px];  /* Text Sm */
+  --text-xs: [10px, 14px];  /* Text XS */
 }
 
 body {
   font-family: var(--font-sans);
 }
 
+/* Scrollbar minimalista */
+::-webkit-scrollbar {
+  width: 8px;
+}
 
+::-webkit-scrollbar-track {
+  background: #f3f4f6; /* gray-100 */
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* gray-300 */
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* gray-400 */
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #f3f4f6; /* gray-100 */
+  border-radius: 12px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* gray-300 */
+  border-radius: 12px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* gray-400 */
+}

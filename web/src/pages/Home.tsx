@@ -45,21 +45,29 @@ async function handleDeleteLink(shortCode: string) {
     }
   } 
 
-    return (
-    <div className="min-h-screen bg-[#F4F7FB] px-4 py-8">
-      {/* Header com logo */}
-      <header className="max-w-5xl mx-auto mb-10">
-        <img src="/Logo.svg" alt="brev.ly" className="h-7" />
-      </header>
+  return (
+  <div className="min-h-screen bg-[#F4F7FB] px-4 pt-8 pb-10 md:pt-14 md:pb-10">
+    {/* Header com logo */}
+    <header className="max-w-6xl mx-auto mb-10 flex justify-center md:justify-start">
+      <img src="/Logo.svg" alt="brev.ly" className="h-7" />
+    </header>
 
-      {/* Conteúdo principal */}
-      <main className="max-w-5xl mx-auto grid grid-cols-1 gap-8 md:grid-cols-2">
-        {/* Card: Novo link */}
-        <LinkForm onCreateSuccess={handleCreateSuccess}/>
+    {/* Conteúdo principal */}
+    <main className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[1.3fr_2fr] gap-8 items-start">
+      {/* Coluna 1: formulário */}
+      <LinkForm onCreateSuccess={handleCreateSuccess} />
 
-        {/* Card: Meus links */}
-        <LinksTable links={links} isLoading={isLoading} error={error} onDelete={handleDeleteLink} />
-      </main>
-    </div>
-  )
+      {/* Coluna 2: tabela */}
+      <LinksTable
+        links={links}
+        isLoading={isLoading}
+        error={error}
+        onDelete={handleDeleteLink}
+      />
+    </main>
+  </div>
+)
+
+
+
 }

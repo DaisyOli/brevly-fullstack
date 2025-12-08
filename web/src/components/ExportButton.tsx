@@ -28,7 +28,7 @@ export function ExportButton() {
         type="button"
         onClick={handleExport}
         disabled={isExporting}
-        className="flex items-center gap-2 rounded-lg border border-[#C6CBD6] px-3 py-1 text-xs text-[#20222A] transition-colors hover:bg-[#F4F7FB] disabled:opacity-60"
+        className="flex items-center gap-2 rounded-lg border border-[#C6CBD6] px-3 py-1 text-[12px] text-[#20222A] transition-colors hover:bg-[#F4F7FB] disabled:opacity-60"
       >
         <img src="/icons/download.png" className="h-4 w-4" />
         <span>{isExporting ? 'Exportando...' : 'Baixar CSV'}</span>
